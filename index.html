@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>المعاصرون | مكتبة إلكترونية</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Tahoma,Arial;background:#f6f4ef;color:#172b40}
+header{background:#10243a;color:white;padding:18px;text-align:center}
+.logo{font-size:30px;color:#e3b765;font-weight:bold}
+header p{margin:8px 0 0;font-size:13px}
+nav{background:#1b354e;padding:13px;text-align:center}
+nav a{color:white;text-decoration:none;margin:0 9px;font-size:13px}
+.hero{padding:45px 20px;text-align:center;background:linear-gradient(135deg,#10243a,#34536a);color:white}
+.hero h1{font-size:34px;margin:0}
+.hero span{color:#e6bd72}
+.hero p{line-height:2}
+button{border:0;padding:12px 20px;border-radius:9px;background:#d5aa5c;color:#10243a;font-weight:bold;cursor:pointer}
+section{padding:25px 15px}
+h2{text-align:center}
+.categories{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.category{background:white;padding:20px;text-align:center;border-radius:12px;border:1px solid #eee}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.product{background:white;padding:12px;border-radius:12px;text-align:center;box-shadow:0 3px 12px #0000000d}
+.product .pic{font-size:48px;background:#f2eee5;padding:15px;border-radius:9px}
+.product h3{font-size:14px}
+.price{color:#b48738;font-weight:bold;margin:12px}
+.product button{width:100%;padding:10px}
+.cart{background:#fff;padding:20px;border-radius:12px}
+input,textarea,select{width:100%;padding:12px;margin:7px 0;border:1px solid #ddd;border-radius:8px;font-family:inherit}
+footer{background:#10243a;color:white;text-align:center;padding:25px;line-height:2}
+#cartItems p{border-bottom:1px solid #eee;padding:8px}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">📚 المعاصرون</div>
+<p>مكتبتك لكل المراحل التعليمية</p>
+</header>
+
+<nav>
+<a href="#home">الرئيسية</a>
+<a href="#categories">الأقسام</a>
+<a href="#products">المنتجات</a>
+<a href="#cart">السلة</a>
+</nav>
+
+<div class="hero" id="home">
+<h1>أهلاً بك في <span>المعاصرون</span></h1>
+<p>كل الكتب والأدوات المدرسية والمكتبية في مكان واحد</p>
+<a href="#products"><button>تسوق الآن</button></a>
+</div>
+
+<section id="categories">
+<h2>📚 أقسام المكتبة</h2>
+<div class="categories">
+<div class="category">📘<br>كتب خارجية</div>
+<div class="category">📝<br>مذكرات ومراجعات</div>
+<div class="category">🎒<br>أدوات مدرسية</div>
+<div class="category">✏️<br>أدوات مكتبية</div>
+<div class="category">📖<br>روايات وقصص</div>
+<div class="category">📚<br>كتب تعليمية</div>
+</div>
+</section>
+
+<section id="products">
+<h2>⭐ منتجاتنا</h2>
+<div class="products" id="productList"></div>
+</section>
+
+<section id="cart">
+<h2>🛒 سلة المشتريات</h2>
+<div class="cart">
+<div id="cartItems">السلة فارغة</div>
+<h3>الإجمالي: <span id="total">0</span> جنيه</h3>
+<h3>بيانات الطلب</h3>
+<input id="name" placeholder="الاسم بالكامل">
+<input id="phone" placeholder="رقم الهاتف" type="tel">
+<textarea id="address" placeholder="عنوان التوصيل"></textarea>
+<button onclick="sendOrder()">تأكيد الطلب</button>
+<p id="result"></p>
+</div>
+</section>
+
+<footer>
+<h2>المعاصرون 📚</h2>
+<p>مكتبتك لكل المراحل التعليمية</p>
+<p>التواصل والشكاوى: 01029132258</p>
+</footer>
+
+<script>
+const products=[
+{id:1,name:"كتاب المعاصر رياضيات",price:185,icon:"📘"},
+{id:2,name:"كتاب المعاصر English",price:175,icon:"📗"},
+{id:3,name:"كشكول سلك",price:45,icon:"📒"},
+{id:4,name:"طقم أقلام",price:35,icon:"🖊️"},
+{id:5,name:"رواية عربية",price:95,icon:"📕"},
+{id:6,name:"ملزمة مراجعة",price:70,icon:"📚"}
+];
+
+let cart=[];
+
+function renderProducts(){
+document.getElementById("productList").innerHTML=products.map(p=>`
+<div class="product">
+<div class="pic">${p.icon}</div>
+<h3>${p.name}</h3>
+<div class="price">${p.price} جنيه</div>
+<button onclick="add(${p.id})">أضف للسلة +</button>
+</div>`).join("");
+}
+
+function add(id){
+let item=cart.find(x=>x.id===id);
+if(item)item.qty++;
+else cart.push({id,qty:1});
+renderCart();
+}
+
+function renderCart(){
+let total=0;
+let html="";
+cart.forEach(item=>{
+let p=products.find(x=>x.id===item.id);
+total+=p.price*item.qty;
+html+=`<p>${p.name} × ${item.qty} — ${p.price*item.qty} جنيه
+<button onclick="removeItem(${p.id})">حذف</button></p>`;
+});
+document.getElementById("cartItems").innerHTML=html||"السلة فارغة";
+document.getElementById("total").textContent=total;
+}
+
+function removeItem(id){
+cart=cart.filter(x=>x.id!==id);
+renderCart();
+}
+
+function sendOrder(){
+let name=document.getElementById("name").value.trim();
+let phone=document.getElementById("phone").value.trim();
+let address=document.getElementById("address").value.trim();
+
+if(!name||!phone||!address||!cart.length){
+alert("من فضلك أكمل البيانات وأضف المنتجات");
+return;
+}
+
+let order={
+name,phone,address,
+items:cart.map(item=>{
+let p=products.find(x=>x.id===item.id);
+return {product:p.name,quantity:item.qty,price:p.price};
+}),
+total:cart.reduce((sum,item)=>sum+products.find(x=>x.id===item.id).price*item.qty,0)
+};
+
+let text="طلب جديد من متجر المعاصرون\n"+
+"الاسم: "+order.name+"\n"+
+"الهاتف: "+order.phone+"\n"+
+"العنوان: "+order.address+"\n"+
+order.items.map(x=>x.product+" × "+x.quantity).join("\n")+
+"\nالإجمالي: "+order.total+" جنيه";
+
+document.getElementById("result").textContent=
+"تم تجهيز الطلب. اضغط إرسال عبر واتساب لإتمام التواصل.";
+
+let url="https://wa.me/201029132258?text="+encodeURIComponent(text);
+window.open(url,"_blank");
+}
+
+renderProducts();
+</script>
+</body>
+</html>
